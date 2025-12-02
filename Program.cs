@@ -1,6 +1,13 @@
+using Microsoft.EntityFrameworkCore;
+using smoothie.Data;
+
 var builder = WebApplication.CreateBuilder(args);
 
-builder.Services.AddMvc();
+string? constr = builder.Configuration.GetConnectionString("DefaultConnection");
+
+builder.Services
+    .AddDbContext<SmoothieContext>(options => options.UseSqlite(constr))
+    .AddMvc();
 
 var app = builder.Build();
 
