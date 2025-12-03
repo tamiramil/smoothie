@@ -16,12 +16,6 @@ public sealed class SmoothieContext : DbContext
     }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder) {
-        modelBuilder.Entity<Employee>()
-            .HasOne(e => e.Company)
-            .WithMany(c => c.Employees)
-            .HasForeignKey(e => e.CompanyId)
-            .OnDelete(DeleteBehavior.Restrict);
-
         modelBuilder.Entity<Project>()
             .HasOne(p => p.CustomerCompany)
             .WithMany(c => c.ProjectsAsCustomer)
@@ -62,21 +56,13 @@ public sealed class SmoothieContext : DbContext
         );
 
         modelBuilder.Entity<Employee>().HasData(
-            new Employee {
-                Id = 101, Name = "Bob", Surename = "Bobson", Email = "bob.bobson@example.com", CompanyId = 101
-            }, new Employee {
-                Id = 102, Name = "Alice", Surename = "Zoe", Email = "alice.braus@example.com", CompanyId = 101
-            }, new Employee {
-                Id = 103, Name = "Catalina", Surename = "Braus", Email = "catalina.braus@example.com", CompanyId = 102
-            }, new Employee {
-                Id = 104, Name = "Burt", Surename = "Ackermann", Email = "burt.ackermann@example.com", CompanyId = 102
-            }, new Employee {
-                Id = 105, Name = "Camille", Surename = "Sadies", Email = "camille.sadies@example.com", CompanyId = 103
-            }, new Employee {
-                Id = 106, Name = "Steven", Surename = "Einstein", Email = "steven.einstein@example.com", CompanyId = 104
-            }, new Employee {
-                Id = 107, Name = "Albert", Surename = "Hoking", Email = "albert.hoking@example.com", CompanyId = 104
-            }
+            new Employee { Id = 101, Name = "Bob", Surename = "Bobson", Email = "bob.bobson@example.com" },
+            new Employee { Id = 102, Name = "Alice", Surename = "Zoe", Email = "alice.braus@example.com" },
+            new Employee { Id = 103, Name = "Catalina", Surename = "Braus", Email = "catalina.braus@example.com" },
+            new Employee { Id = 104, Name = "Burt", Surename = "Ackermann", Email = "burt.ackermann@example.com" },
+            new Employee { Id = 105, Name = "Camille", Surename = "Sadies", Email = "camille.sadies@example.com" },
+            new Employee { Id = 106, Name = "Steven", Surename = "Einstein", Email = "steven.einstein@example.com" },
+            new Employee { Id = 107, Name = "Albert", Surename = "Hoking", Email = "albert.hoking@example.com" }
         );
 
         base.OnModelCreating(modelBuilder);
