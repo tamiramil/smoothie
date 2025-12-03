@@ -96,7 +96,7 @@ public class EmployeesController : Controller
     }
 
     [HttpPost, ActionName("Delete")]
-    public async Task<IActionResult> Delete(int id) {
+    public async Task<IActionResult> DeleteConfirm(int id) {
         var employee = await _context.Employees.FindAsync(id);
         if (employee is not null) {
             _context.Remove(employee);
