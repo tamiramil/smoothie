@@ -16,5 +16,6 @@ public class Project
     public int      HeadId { get; set; }
     public Employee Head   { get; set; }
 
-    public ICollection<Employee> Employees { get; set; }
+    public ICollection<Employee>        Employees { get; set; }
+    public ICollection<ProjectDocument> Documents { get; set; }
 }

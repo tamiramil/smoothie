@@ -9,6 +9,8 @@ public sealed class SmoothieContext : DbContext
     public DbSet<Company>  Companies { get; set; } = null!;
     public DbSet<Project>  Projects  { get; set; } = null!;
 
+    public DbSet<ProjectDocument> ProjectDocuments { get; set; } = null!;
+
     public SmoothieContext(DbContextOptions<SmoothieContext> options) : base(options) {
         Database.EnsureCreated();
     }
@@ -45,6 +47,12 @@ public sealed class SmoothieContext : DbContext
         modelBuilder.Entity<Employee>()
             .HasMany(e => e.AssignedProjects)
             .WithMany(e => e.Employees);
+
+        modelBuilder.Entity<ProjectDocument>()
+            .HasOne(pd => pd.Project)
+            .WithMany(p => p.Documents)
+            .HasForeignKey(pd => pd.ProjectId)
+            .OnDelete(DeleteBehavior.Restrict);
 
         modelBuilder.Entity<Company>().HasData(
             new Company { Id = 101, Name = "Smoothie" },
