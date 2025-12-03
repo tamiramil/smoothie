@@ -89,9 +89,10 @@ public class EmployeesController : Controller
         }
 
         var employee = await _context.Employees.FirstOrDefaultAsync(e => e.Id == id);
+        if (employee is null) {
+            return NotFound();
+        }
 
-        _context.Remove(employee);
-        await _context.SaveChangesAsync();
         return View(employee);
     }
 
