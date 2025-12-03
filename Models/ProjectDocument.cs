@@ -9,5 +9,5 @@ public class ProjectDocument
     
     public string FileName { get; set; }
     public string FilePath { get; set; }
-    public int    FileSize { get; set; }
+    public long   FileSize { get; set; }
 }
