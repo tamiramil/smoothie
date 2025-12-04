@@ -11,5 +11,5 @@ public class Employee
     public ICollection<Project> ManagedProjects  { get; set; }
     public ICollection<Project> AssignedProjects { get; set; }
     
-    public string FullName => $"{FirstName} {SecondName} {LastName}";
+    public string FullName => $"{FirstName} {SecondName}{(SecondName != null ? " " : "")}{LastName}";
 }

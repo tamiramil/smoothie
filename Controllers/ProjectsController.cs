@@ -198,7 +198,22 @@ public class ProjectsController : Controller
         return RedirectToAction(nameof(Details), new { id = project.Id });
     }
 
-    [HttpPost]
+    [HttpGet]
+    public async Task<IActionResult> SearchEmployees(string pattern) {
+        var employees = await _context.Employees.ToListAsync();
+
+        if (!string.IsNullOrWhiteSpace(pattern)) {
+            pattern = pattern.ToLower();
+            employees = employees.Where(e => e.FullName.ToLower().Contains(pattern)).ToList();
+        }
+
+        var result = employees.Select(e => new {
+            id = e.Id,
+            fullName = e.FullName
+        }).Take(25).ToList();
+
+        return Json(result);
+    }
 
     #region Create
 
@@ -458,7 +473,7 @@ public class ProjectsController : Controller
     #region Create helpers
 
     private ProjectWizardViewModel? LoadModel() {
-        var json = HttpContext.Session.Get(WizardKey);
+        var json = HttpContext.Session.GetString(WizardKey);
         return JsonSerializer.Deserialize<ProjectWizardViewModel>(json);
     }
 
