@@ -122,6 +122,8 @@ src/.vs/config/applicationhost.config
 *.db3
 *.sqlite
 *.sqlite3
+*.db-shm
+*.db-wal
 
 # Backups
 *.bak
