@@ -474,7 +474,7 @@ public class ProjectsController : Controller
 
     private async Task PopulateEmployeesDropdown(ProjectWizardViewModel model) {
         var employees = await _context.Employees.ToListAsync();
-        model.AllEmployees = new SelectList(employees, "Id", "Name");
+        model.AllEmployees = new SelectList(employees, "Id", "FullName");
     }
 
     #endregion
