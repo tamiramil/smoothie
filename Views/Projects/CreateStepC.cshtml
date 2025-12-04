@@ -1,0 +1,43 @@
+@model smoothie.ViewModel.ProjectWizardViewModel
+
+@{
+    ViewData["Title"] = "Create Project - Step 3";
+}
+
+<div class="container mt-4">
+    <div class="row">
+        <div class="col-md-8 offset-md-2">
+            <h2>Create New Project</h2>
+            <div class="card">
+                <div class="card-header">
+                    <h4>Project Head</h4>
+                </div>
+                <div class="card-body">
+                    <form asp-action="CreateStepC" method="post">
+                        <div class="form-group mb-3">
+                            <label asp-for="HeadId" class="form-label">Select Project Head</label>
+                            <select asp-for="HeadId" asp-items="Model.AllEmployees" class="form-select">
+                                <option value="">-- Select Project Head --</option>
+                            </select>
+                            <span asp-validation-for="HeadId" class="text-danger"></span>
+                            <small class="form-text text-muted">The project head will be automatically added to the
+                                project team.</small>
+                        </div>
+
+                        <div class="d-flex justify-content-between mt-4">
+                            <button type="submit" name="action" value="back" class="btn btn-secondary">Back</button>
+                            <div>
+                                <a asp-action="Index" class="btn btn-outline-secondary me-2">Cancel</a>
+                                <button type="submit" name="action" value="next" class="btn btn-primary">Next</button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{ await Html.RenderPartialAsync("_ValidationScriptsPartial"); }
+}

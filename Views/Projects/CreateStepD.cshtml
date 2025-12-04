@@ -1,0 +1,101 @@
+@model smoothie.ViewModel.ProjectWizardViewModel
+
+@{
+    ViewData["Title"] = "Create Project - Step 4";
+}
+
+<div class="container mt-4">
+    <div class="row">
+        <div class="col-md-8 offset-md-2">
+            <h2>Create New Project</h2>
+            <div class="card">
+                <div class="card-header">
+                    <h4>Select Team Members</h4>
+                </div>
+                <div class="card-body">
+                    <form asp-action="CreateStepD" method="post">
+                        <div class="alert alert-info mb-3">
+                            <i class="bi bi-info-circle"></i> Select employees to add to the project team. The project head will be automatically included.
+                        </div>
+
+                        @if (Model.AvailableEmployees != null && Model.AvailableEmployees.Any())
+                        {
+                            <div class="mb-3">
+                                <div class="form-check">
+                                    <input type="checkbox" id="selectAll" class="form-check-input" />
+                                    <label class="form-check-label fw-bold" for="selectAll">
+                                        Select All
+                                    </label>
+                                </div>
+                            </div>
+
+                            <div class="list-group mb-3" style="max-height: 400px; overflow-y: auto;">
+                                @foreach (var employee in Model.AvailableEmployees)
+                                {
+                                    <div class="list-group-item">
+                                        <div class="form-check">
+                                            <input type="checkbox" 
+                                                   name="EmployeeIds" 
+                                                   value="@employee.Id" 
+                                                   class="form-check-input employee-checkbox" 
+                                                   id="emp_@employee.Id"
+                                                   @(Model.EmployeeIds != null && Model.EmployeeIds.Contains(employee.Id) ? "checked" : "") />
+                                            <label class="form-check-label" for="emp_@employee.Id">
+                                                @employee.Name @employee.Surname
+                                            </label>
+                                        </div>
+                                    </div>
+                                }
+                            </div>
+                        }
+                        else
+                        {
+                            <div class="alert alert-warning">
+                                No employees available to select.
+                            </div>
+                        }
+
+                        <div class="d-flex justify-content-between mt-4">
+                            <button type="submit" name="action" value="back" class="btn btn-secondary">Back</button>
+                            <div>
+                                <a asp-action="Index" class="btn btn-outline-secondary me-2">Cancel</a>
+                                <button type="submit" name="action" value="next" class="btn btn-primary">Next</button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const selectAllCheckbox = document.getElementById('selectAll');
+            const employeeCheckboxes = document.querySelectorAll('.employee-checkbox');
+            
+            // Select/Deselect all functionality
+            selectAllCheckbox.addEventListener('change', function() {
+                employeeCheckboxes.forEach(checkbox => {
+                    checkbox.checked = this.checked;
+                });
+            });
+            
+            // Update "Select All" checkbox when individual checkboxes change
+            employeeCheckboxes.forEach(checkbox => {
+                checkbox.addEventListener('change', function() {
+                    const allChecked = Array.from(employeeCheckboxes).every(cb => cb.checked);
+                    selectAllCheckbox.checked = allChecked;
+                });
+            });
+            
+            // Initialize "Select All" state
+            const allChecked = Array.from(employeeCheckboxes).every(cb => cb.checked);
+            if (allChecked && employeeCheckboxes.length > 0) {
+                selectAllCheckbox.checked = true;
+            }
+        });
+    </script>
+}

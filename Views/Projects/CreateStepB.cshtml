@@ -1,0 +1,53 @@
+@model smoothie.ViewModel.ProjectWizardViewModel
+
+@{
+    ViewData["Title"] = "Create Project - Step 2";
+}
+
+<div class="container mt-4">
+    <div class="row">
+        <div class="col-md-8 offset-md-2">
+            <h2>Create New Project</h2>
+            <div class="card">
+                <div class="card-header">
+                    <h4>Company Information</h4>
+                </div>
+                <div class="card-body">
+                    <form asp-action="CreateStepB" method="post">
+                        <div class="form-group mb-3">
+                            <label asp-for="CustomerCompanyId" class="form-label">Customer Company</label>
+                            <select asp-for="CustomerCompanyId" asp-items="Model.Companies" class="form-select">
+                                <option value="">-- Select Customer Company --</option>
+                            </select>
+                            <span asp-validation-for="CustomerCompanyId" class="text-danger"></span>
+                        </div>
+
+                        <div class="form-group mb-3">
+                            <label asp-for="ExecutorCompanyId" class="form-label">Executor Company</label>
+                            <select asp-for="ExecutorCompanyId" asp-items="Model.Companies" class="form-select">
+                                <option value="">-- Select Executor Company --</option>
+                            </select>
+                            <span asp-validation-for="ExecutorCompanyId" class="text-danger"></span>
+                        </div>
+
+                        <div class="alert alert-info">
+                            <i class="bi bi-info-circle"></i> Customer and executor companies must be different.
+                        </div>
+
+                        <div class="d-flex justify-content-between mt-4">
+                            <button type="submit" name="action" value="back" class="btn btn-secondary">Back</button>
+                            <div>
+                                <a asp-action="Index" class="btn btn-outline-secondary me-2">Cancel</a>
+                                <button type="submit" name="action" value="next" class="btn btn-primary">Next</button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{ await Html.RenderPartialAsync("_ValidationScriptsPartial"); }
+}
