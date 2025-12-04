@@ -41,7 +41,7 @@
                                                    id="emp_@employee.Id"
                                                    @(Model.EmployeeIds != null && Model.EmployeeIds.Contains(employee.Id) ? "checked" : "") />
                                             <label class="form-check-label" for="emp_@employee.Id">
-                                                @employee.Name @employee.Surname
+                                                @employee.FirstName @employee.LastName
                                             </label>
                                         </div>
                                     </div>

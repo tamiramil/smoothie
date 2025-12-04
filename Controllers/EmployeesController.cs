@@ -30,7 +30,9 @@ public class EmployeesController : Controller
             .Include(e => e.AssignedProjects)
             .FirstOrDefaultAsync(e => e.Id == id);
 
-        if (employee == null) return NotFound();
+        if (employee == null) {
+            return NotFound();
+        }
 
         return View(employee);
     }
@@ -89,6 +91,7 @@ public class EmployeesController : Controller
         }
 
         var employee = await _context.Employees.FirstOrDefaultAsync(e => e.Id == id);
+
         if (employee is null) {
             return NotFound();
         }
@@ -99,10 +102,12 @@ public class EmployeesController : Controller
     [HttpPost, ActionName("Delete")]
     public async Task<IActionResult> DeleteConfirm(int id) {
         var employee = await _context.Employees.FindAsync(id);
+
         if (employee is not null) {
             _context.Remove(employee);
             await _context.SaveChangesAsync();
         }
+
         return RedirectToAction(nameof(Index));
     }
 }

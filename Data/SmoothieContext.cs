@@ -56,13 +56,13 @@ public sealed class SmoothieContext : DbContext
         );
 
         modelBuilder.Entity<Employee>().HasData(
-            new Employee { Id = 101, Name = "Bob", Surname = "Bobson", Email = "bob.bobson@example.com" },
-            new Employee { Id = 102, Name = "Alice", Surname = "Zoe", Email = "alice.braus@example.com" },
-            new Employee { Id = 103, Name = "Catalina", Surname = "Braus", Email = "catalina.braus@example.com" },
-            new Employee { Id = 104, Name = "Burt", Surname = "Ackermann", Email = "burt.ackermann@example.com" },
-            new Employee { Id = 105, Name = "Camille", Surname = "Sadies", Email = "camille.sadies@example.com" },
-            new Employee { Id = 106, Name = "Steven", Surname = "Einstein", Email = "steven.einstein@example.com" },
-            new Employee { Id = 107, Name = "Albert", Surname = "Hoking", Email = "albert.hoking@example.com" }
+            new Employee { Id = 101, FirstName = "Bob", LastName = "Bobson", Email = "bob.bobson@example.com" },
+            new Employee { Id = 102, FirstName = "Alice", LastName = "Zoe", Email = "alice.braus@example.com" },
+            new Employee { Id = 103, FirstName = "Catalina", LastName = "Braus", Email = "catalina.braus@example.com" },
+            new Employee { Id = 104, FirstName = "Burt", LastName = "Ackermann", Email = "burt.ackermann@example.com" },
+            new Employee { Id = 105, FirstName = "Camille", LastName = "Sadies", Email = "camille.sadies@example.com" },
+            new Employee { Id = 106, FirstName = "Steven", LastName = "House", Email = "steven.house@example.com" },
+            new Employee { Id = 107, FirstName = "Albert", LastName = "Hoking", Email = "albert.hoking@example.com" }
         );
 
         base.OnModelCreating(modelBuilder);
