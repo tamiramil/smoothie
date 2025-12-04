@@ -230,7 +230,7 @@ public class ProjectsController : Controller
         }
 
         if (!ModelState.IsValid) {
-            return View();
+            return View(model);
         }
 
         SaveModel(model);
