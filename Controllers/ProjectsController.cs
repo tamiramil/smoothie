@@ -553,12 +553,12 @@ public class ProjectsController : Controller
             await _context.Companies.ToListAsync(), "Id", "Name", project?.CustomerCompanyId
         );
 
-        ViewData["PerformerCompanyId"] = new SelectList(
+        ViewData["ExecutorCompanyId"] = new SelectList(
             await _context.Companies.ToListAsync(), "Id", "Name", project?.ExecutorCompanyId
         );
 
         ViewData["HeadId"] = new SelectList(
-            await _context.Employees.ToListAsync(), "Id", "Name", project?.HeadId
+            await _context.Employees.ToListAsync(), "Id", "FullName", project?.HeadId
         );
     }
 
