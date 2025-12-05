@@ -23,6 +23,12 @@
                 <th>@employee.Email</th>
                 <th>@employee.ManagedProjects.Count</th>
                 <th>@employee.AssignedProjects.Count</th>
+                <td>
+                    <a asp-action="Edit" asp-route-id="@employee.Id" class="btn btn-sm btn-outline-primary">Edit</a>
+                </td>
+                <td>
+                    <a asp-action="Delete" asp-route-id="@employee.Id" class="btn btn-sm btn-outline-primary">Delete</a>
+                </td>
             </tr>
         }
     }
