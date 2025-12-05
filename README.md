@@ -12,10 +12,10 @@ Test project for Sibers — intern/junior C# Developer
 ## Run Requirements
 
 - [.NET 9 SDK](https://dotnet.microsoft.com/download/dotnet/9.0)
-- Любая IDE (опционально): Visual Studio 2022, VS Code, Rider
+- Any IDE (optional): Visual Studio, VS Code, Rider
 
 ## Quick Start
-In terminal (if Windows: press `Win+R`, type `cmd`, press enter)
+In terminal (if Windows: press `Win+R`, type `cmd`, press `Enter`)
 ```bash
 git clone https://github.com/tamiramil/smoothie.git
 cd smoothie
@@ -73,8 +73,8 @@ smoothie
 
 #### Backend
 
-- [x] **CRUD for Projects**
-- [x] **CRUD for Employees and Companies** (through API, not UI)
+- [x] **CRUD for Projects and Employees**
+- [x] **CRUD for Companies** (through API, not UI)
 - [x] **Projects list filtering and sorting**
 
 #### Frontend (Razor)
