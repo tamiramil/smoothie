@@ -8,6 +8,6 @@ public class Company
 
     public ICollection<Employee> Employees { get; set; }
 
-    public ICollection<Project> ProjectsAsCustomer { get; set; }
-    public ICollection<Project> ProjectsAsExecutor { get; set; }
+    public ICollection<Project> ProjectsAsCustomer { get; set; } = new List<Project>();
+    public ICollection<Project> ProjectsAsExecutor { get; set; } = new List<Project>();
 }

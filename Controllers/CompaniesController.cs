@@ -20,6 +20,12 @@ public class CompaniesController : Controller
     }
 
     [HttpGet]
+    public IActionResult Create() {
+        var model = new Company();
+        return View(model);
+    }
+    
+    [HttpPost]
     public async Task<IActionResult> Create(Company company) {
         if (ModelState.IsValid) {
             _context.Add(company);
