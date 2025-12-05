@@ -28,4 +28,10 @@ app.MapControllerRoute(
         pattern: "{controller=Projects}/{action=Index}/{id?}")
     .WithStaticAssets();
 
+using (var scope = app.Services.CreateScope())
+{
+    var context = scope.ServiceProvider.GetRequiredService<SmoothieContext>();
+    context.Database.EnsureCreated();
+}
+
 app.Run();

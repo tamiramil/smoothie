@@ -11,9 +11,7 @@ public sealed class SmoothieContext : DbContext
 
     public DbSet<ProjectDocument> ProjectDocuments { get; set; } = null!;
 
-    public SmoothieContext(DbContextOptions<SmoothieContext> options) : base(options) {
-        Database.EnsureCreated();
-    }
+    public SmoothieContext(DbContextOptions<SmoothieContext> options) : base(options) { }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder) {
         modelBuilder.Entity<Project>()
