@@ -130,27 +130,18 @@
         </tr>
     </thead>
     <tbody>
-    @if (Model != null && Model.Any())
-    {
-        foreach (var item in Model)
-        {
+    @if (Model.Any()) {
+        foreach (var item in Model) {
             <tr>
                 <td>@item.Name</td>
                 <td>@item.StartDate.ToString("yyyy-MM-dd")</td>
                 <td>@item.EndDate.ToString("yyyy-MM-dd")</td>
                 <td>@item.Priority</td>
-                <td>@(item.CustomerCompany != null ? item.CustomerCompany.Name : "—")</td>
-                <td>@(item.ExecutorCompany != null ? item.ExecutorCompany.Name : "—")</td>
-                <td>
-                    @{
-                        // не зная точных полей Employee, выводим ToString() (если модель Employee переопределяет его),
-                        // иначе показываем Id (как fallback)
-                        var headDisplay = item.Head != null ? item.Head.ToString() : null;
-                    }
-                    @(headDisplay ?? (item.Head != null ? item.Head.Id.ToString() : "—"))
-                </td>
-                <td>@(item.Employees?.Count ?? 0)</td>
-                <td>@(item.Documents?.Count ?? 0)</td>
+                <td>@item.CustomerCompany.Name</td>
+                <td>@item.ExecutorCompany.Name</td>
+                <td>@item.Head.FullName;</td>
+                <td>@(item.Employees.Count)</td>
+                <td>@(item.Documents.Count)</td>
                 <td>
                     <a asp-action="Edit" asp-route-id="@item.Id" class="btn btn-sm btn-outline-primary">Edit</a>
                 </td>
