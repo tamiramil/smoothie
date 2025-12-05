@@ -37,6 +37,12 @@ public class EmployeesController : Controller
         return View(employee);
     }
 
+    [HttpGet]
+    public async Task<IActionResult> Create() {
+        var model = new Employee();
+        return View(model);
+    }
+    
     [HttpPost]
     public async Task<IActionResult> Create(Employee employee) {
         if (ModelState.IsValid) {
