@@ -1,0 +1,35 @@
+@model IEnumerable<smoothie.Models.Employee>
+
+@{
+    ViewData["Title"] = "Employees";
+}
+
+<h1 class="pb-2">Employees</h1>
+
+<table class="table table-striped table-bordered align-middle">
+    <thead>
+    <tr>
+        <th>Full Name</th>
+        <th>Email</th>
+        <th>Proj. Managed</th>
+        <th>Proj. Engaged</th>
+    </tr>
+    </thead>
+    <tbody>
+    @if (Model.Any()) {
+        foreach (var employee in Model) {
+            <tr>
+                <th>@employee.FullName</th>
+                <th>@employee.Email</th>
+                <th>@employee.ManagedProjects.Count</th>
+                <th>@employee.AssignedProjects.Count</th>
+            </tr>
+        }
+    }
+    else {
+        <tr>
+            <td colspan="10" class="text-center">No employees found.</td>
+        </tr>
+    }
+    </tbody>
+</table>

@@ -8,8 +8,8 @@ public class Employee
     public string  LastName   { get; set; }
     public string  Email      { get; set; }
 
-    public ICollection<Project> ManagedProjects  { get; set; }
-    public ICollection<Project> AssignedProjects { get; set; }
+    public ICollection<Project> ManagedProjects  { get; set; } = new List<Project>();
+    public ICollection<Project> AssignedProjects { get; set; } = new List<Project>();
     
     public string FullName => $"{FirstName} {SecondName}{(SecondName != null ? " " : "")}{LastName}";
 }
