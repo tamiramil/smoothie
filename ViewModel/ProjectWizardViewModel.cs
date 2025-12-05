@@ -28,7 +28,5 @@ public class ProjectWizardViewModel
 
     public int CurrentStep { get; set; } = 1;
 
-    public SelectList?     Companies          { get; set; }
-    public SelectList?     AllEmployees       { get; set; }
-    public List<Employee>? AvailableEmployees { get; set; } = new();
+    public SelectList? Companies { get; set; }
 }

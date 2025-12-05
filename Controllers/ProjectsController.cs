@@ -308,8 +308,6 @@ public class ProjectsController : Controller
         }
 
         model.CurrentStep = 3;
-        await PopulateEmployeesDropdown(model);
-
         return View(model);
     }
 
@@ -330,7 +328,6 @@ public class ProjectsController : Controller
 
         if (!sessionModel.HeadId.HasValue) {
             ModelState.AddModelError("HeadId", "Head must be set");
-            await PopulateEmployeesDropdown(sessionModel);
             return View(sessionModel);
         }
 
@@ -346,8 +343,6 @@ public class ProjectsController : Controller
         }
 
         model.CurrentStep = 4;
-        model.AvailableEmployees = await _context.Employees.ToListAsync();
-
         return View(model);
     }
 
@@ -485,11 +480,6 @@ public class ProjectsController : Controller
     private async Task PopulateCompaniesDropdown(ProjectWizardViewModel model) {
         var companies = await _context.Companies.ToListAsync();
         model.Companies = new SelectList(companies, "Id", "Name");
-    }
-
-    private async Task PopulateEmployeesDropdown(ProjectWizardViewModel model) {
-        var employees = await _context.Employees.ToListAsync();
-        model.AllEmployees = new SelectList(employees, "Id", "FullName");
     }
 
     #endregion
