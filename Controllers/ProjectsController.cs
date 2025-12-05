@@ -20,6 +20,18 @@ public class ProjectsController : Controller
         _environment = environment;
     }
 
+    /// <summary>
+    /// Displays a list of projects with optional filtering and sorting.
+    /// </summary>
+    /// <param name="sortOrder">The field and direction to sort by (e.g., "name_desc", "start_date").</param>
+    /// <param name="startDateFrom">Filter projects with start date on or after this date.</param>
+    /// <param name="startDateTo">Filter projects with start date on or before this date.</param>
+    /// <param name="endDateFrom">Filter projects with end date on or after this date.</param>
+    /// <param name="endDateTo">Filter projects with end date on or before this date.</param>
+    /// <param name="priority">Filter projects by specific priority value.</param>
+    /// <param name="customerCompanyId">Filter projects by customer company ID.</param>
+    /// <param name="executorCompanyId">Filter projects by executor company ID.</param>
+    /// <returns>A view displaying the filtered and sorted list of projects.</returns>
     [HttpGet]
     public async Task<IActionResult> Index(
         string sortOrder,
@@ -82,6 +94,11 @@ public class ProjectsController : Controller
         return View(await projects.ToListAsync());
     }
 
+    /// <summary>
+    /// Displays detailed information about a specific project.
+    /// </summary>
+    /// <param name="id">The ID of the project to display.</param>
+    /// <returns>A view with project details, or NotFound if the project doesn't exist.</returns>
     [HttpGet]
     public async Task<IActionResult> Details(int? id) {
         if (id == null)
@@ -106,6 +123,11 @@ public class ProjectsController : Controller
         return View(project);
     }
 
+    /// <summary>
+    /// Displays the edit form for a specific project.
+    /// </summary>
+    /// <param name="id">The ID of the project to edit.</param>
+    /// <returns>A view with the project edit form, or NotFound if the project doesn't exist.</returns>
     [HttpGet]
     public async Task<IActionResult> Edit(int? id) {
         if (id is null) {
@@ -124,6 +146,12 @@ public class ProjectsController : Controller
         return View(project);
     }
 
+    /// <summary>
+    /// Processes the project edit form submission.
+    /// </summary>
+    /// <param name="id">The ID of the project being edited.</param>
+    /// <param name="project">The updated project data from the form.</param>
+    /// <returns>Redirects to Index on success, or returns the view with validation errors.</returns>
     [HttpPost]
     public async Task<IActionResult> Edit(int? id, Project project) {
         if (id != project.Id) {
@@ -149,6 +177,11 @@ public class ProjectsController : Controller
         return RedirectToAction(nameof(Index));
     }
 
+    /// <summary>
+    /// Displays the delete confirmation page for a project.
+    /// </summary>
+    /// <param name="id">The ID of the project to delete.</param>
+    /// <returns>A view with project details for confirmation, or NotFound if the project doesn't exist.</returns>
     [HttpGet]
     public async Task<IActionResult> Delete(int? id) {
         if (id is null) {
@@ -168,6 +201,11 @@ public class ProjectsController : Controller
         return View(project);
     }
 
+    /// <summary>
+    /// Processes the project deletion after user confirmation.
+    /// </summary>
+    /// <param name="id">The ID of the project to delete.</param>
+    /// <returns>Redirects to Index after successful deletion.</returns>
     [HttpPost, ActionName("Delete")]
     public async Task<IActionResult> DeleteConfirmed(int? id) {
         var project = await _context.Projects.FindAsync(id);
@@ -178,6 +216,12 @@ public class ProjectsController : Controller
         return RedirectToAction(nameof(Index));
     }
 
+    /// <summary>
+    /// Adds an employee to a project's team.
+    /// </summary>
+    /// <param name="projectId">The ID of the project.</param>
+    /// <param name="employeeId">The ID of the employee to add.</param>
+    /// <returns>Redirects to project Details, or NotFound if project or employee doesn't exist.</returns>
     [HttpPost]
     public async Task<IActionResult> AddEmployee(int? projectId, int? employeeId) {
         var project = await _context.Projects
@@ -198,6 +242,11 @@ public class ProjectsController : Controller
         return RedirectToAction(nameof(Details), new { id = project.Id });
     }
 
+    /// <summary>
+    /// Searches for employees by name pattern and returns matching results as JSON.
+    /// </summary>
+    /// <param name="pattern">The search pattern to match against employee names.</param>
+    /// <returns>A JSON array of matching employees (up to 25 results) with id and fullName properties.</returns>
     [HttpGet]
     public async Task<IActionResult> SearchEmployees(string pattern) {
         var employees = await _context.Employees.ToListAsync();
@@ -217,6 +266,10 @@ public class ProjectsController : Controller
 
     #region Create
 
+    /// <summary>
+    /// Initiates the multi-step project creation wizard.
+    /// </summary>
+    /// <returns>A view for the first step of project creation.</returns>
     [HttpGet]
     public IActionResult Create() {
         HttpContext.Session.Remove(WizardKey);
@@ -225,7 +278,11 @@ public class ProjectsController : Controller
         return View("CreateStepA", model);
     }
 
-
+    /// <summary>
+    /// Processes the first step of project creation (basic project information).
+    /// </summary>
+    /// <param name="model">The wizard model containing project name, dates, and priority.</param>
+    /// <returns>Redirects to Step B on success, or returns the view with validation errors.</returns>
     [HttpPost]
     public IActionResult CreateStepA(ProjectWizardViewModel model) {
         if (string.IsNullOrWhiteSpace(model.Name)) {
@@ -252,6 +309,10 @@ public class ProjectsController : Controller
         return RedirectToAction(nameof(CreateStepB));
     }
 
+    /// <summary>
+    /// Displays the second step of project creation (company selection).
+    /// </summary>
+    /// <returns>A view for selecting customer and executor companies, or redirects to Create if session is lost.</returns>
     [HttpGet]
     public async Task<IActionResult> CreateStepB() {
         var model = LoadModel();
@@ -265,6 +326,12 @@ public class ProjectsController : Controller
         return View(model);
     }
 
+    /// <summary>
+    /// Processes the second step of project creation (company selection).
+    /// </summary>
+    /// <param name="model">The wizard model containing selected companies.</param>
+    /// <param name="action">The action to perform ("back" to return to previous step).</param>
+    /// <returns>Redirects based on action and validation results.</returns>
     [HttpPost]
     public async Task<IActionResult> CreateStepB(ProjectWizardViewModel model, string action) {
         var sessionModel = LoadModel();
@@ -300,6 +367,10 @@ public class ProjectsController : Controller
         return RedirectToAction(nameof(CreateStepC));
     }
 
+    /// <summary>
+    /// Displays the third step of project creation (project head selection).
+    /// </summary>
+    /// <returns>A view for selecting the project head, or redirects to Create if session is lost.</returns>
     [HttpGet]
     public async Task<IActionResult> CreateStepC() {
         var model = LoadModel();
@@ -311,6 +382,12 @@ public class ProjectsController : Controller
         return View(model);
     }
 
+    /// <summary>
+    /// Processes the third step of project creation (project head selection).
+    /// </summary>
+    /// <param name="model">The wizard model containing the selected head.</param>
+    /// <param name="action">The action to perform ("back" to return to previous step).</param>
+    /// <returns>Redirects based on action and validation results.</returns>
     [HttpPost]
     public async Task<IActionResult> CreateStepC(ProjectWizardViewModel model, string action) {
         var sessionModel = LoadModel();
@@ -335,6 +412,10 @@ public class ProjectsController : Controller
         return RedirectToAction(nameof(CreateStepD));
     }
 
+    /// <summary>
+    /// Displays the fourth step of project creation (team member selection).
+    /// </summary>
+    /// <returns>A view for selecting project team members, or redirects to Create if session is lost.</returns>
     [HttpGet]
     public async Task<IActionResult> CreateStepD() {
         var model = LoadModel();
@@ -346,6 +427,12 @@ public class ProjectsController : Controller
         return View(model);
     }
 
+    /// <summary>
+    /// Processes the fourth step of project creation (team member selection).
+    /// </summary>
+    /// <param name="model">The wizard model containing selected employee IDs.</param>
+    /// <param name="action">The action to perform ("back" to return to previous step).</param>
+    /// <returns>Redirects based on action.</returns>
     [HttpPost]
     public IActionResult CreateStepD(ProjectWizardViewModel model, string action) {
         var sessionModel = LoadModel();
@@ -369,6 +456,10 @@ public class ProjectsController : Controller
         return RedirectToAction(nameof(CreateStepE));
     }
 
+    /// <summary>
+    /// Displays the final step of project creation (document upload).
+    /// </summary>
+    /// <returns>A view for uploading project documents, or redirects to Create if session is lost.</returns>
     [HttpGet]
     public IActionResult CreateStepE() {
         var model = LoadModel();
@@ -380,6 +471,12 @@ public class ProjectsController : Controller
         return View(model);
     }
 
+    /// <summary>
+    /// Processes the final step of project creation, saves the project and uploads documents.
+    /// </summary>
+    /// <param name="files">The collection of files to upload with the project.</param>
+    /// <param name="action">The action to perform ("back" to return to previous step).</param>
+    /// <returns>Redirects to Index on success, or back to Step D if going back.</returns>
     [HttpPost]
     public async Task<IActionResult> CreateStepE(IList<IFormFile>? files, string action) {
         var model = LoadModel();
