@@ -158,7 +158,7 @@ public class ProjectsController : Controller
             return NotFound();
         }
 
-        if (ModelState.IsValid) {
+        if (!ModelState.IsValid) {
             await PopulateEditDropDowns();
             return View(project);
         }
