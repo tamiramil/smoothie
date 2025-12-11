@@ -249,17 +249,17 @@ public class ProjectsController : Controller
     /// <returns>A JSON array of matching employees (up to 25 results) with id and fullName properties.</returns>
     [HttpGet]
     public async Task<IActionResult> SearchEmployees(string pattern) {
-        var employees = await _context.Employees.ToListAsync();
+        var query = _context.Employees.AsQueryable();
 
         if (!string.IsNullOrWhiteSpace(pattern)) {
             pattern = pattern.ToLower();
-            employees = employees.Where(e => e.FullName.ToLower().Contains(pattern)).ToList();
+            query = query.Where(e => e.FullName.ToLower().Contains(pattern));
         }
 
-        var result = employees.Select(e => new {
+        var result = await query.Select(e => new {
             id = e.Id,
             fullName = e.FullName
-        }).Take(25).ToList();
+        }).Take(25).ToListAsync();
 
         return Json(result);
     }
