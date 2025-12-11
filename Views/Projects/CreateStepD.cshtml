@@ -73,7 +73,7 @@
         function loadEmployees(pattern) {
             const selected = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Model.EmployeeIds));
 
-            fetch(`/Projects/SearchEmployees/?pattern=${encodeURIComponent(pattern)}`)
+            fetch(`/Employees/SearchByPattern/?pattern=${encodeURIComponent(pattern)}`)
                 .then(r => r.json())
                 .then(data => {
                     container.innerHTML = "";

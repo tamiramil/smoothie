@@ -56,7 +56,7 @@
         });
 
         function loadEmployees(pattern) {
-            fetch(`/Projects/SearchEmployees/?pattern=${encodeURIComponent(pattern)}`)
+            fetch(`/Employees/SearchByPattern/?pattern=${encodeURIComponent(pattern)}`)
                 .then(r => r.json())
                 .then(data => {
                     container.innerHTML = "";

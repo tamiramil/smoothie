@@ -242,28 +242,6 @@ public class ProjectsController : Controller
         return RedirectToAction(nameof(Details), new { id = project.Id });
     }
 
-    /// <summary>
-    /// Searches for employees by name pattern and returns matching results as JSON.
-    /// </summary>
-    /// <param name="pattern">The search pattern to match against employee names.</param>
-    /// <returns>A JSON array of matching employees (up to 25 results) with id and fullName properties.</returns>
-    [HttpGet]
-    public async Task<IActionResult> SearchEmployees(string pattern) {
-        var query = _context.Employees.AsQueryable();
-
-        if (!string.IsNullOrWhiteSpace(pattern)) {
-            pattern = pattern.ToLower();
-            query = query.Where(e => e.FullName.ToLower().Contains(pattern));
-        }
-
-        var result = await query.Select(e => new {
-            id = e.Id,
-            fullName = e.FullName
-        }).Take(25).ToListAsync();
-
-        return Json(result);
-    }
-
     #region Create
 
     /// <summary>
