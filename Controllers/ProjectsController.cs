@@ -10,6 +10,8 @@ namespace smoothie.Controllers;
 
 public class ProjectsController : Controller
 {
+    private const int AttemptsNumber = 3;
+
     private const string WizardKey = "ProjectWizard";
 
     private readonly SmoothieContext     _context;
@@ -488,7 +490,6 @@ public class ProjectsController : Controller
         }
 
         _context.Projects.Add(project);
-        await _context.SaveChangesAsync();
 
         if (files is not null && files.Any()) {
             var uploadPath = Path.Combine(_environment.WebRootPath, "uploads", "projects", project.Id.ToString());
@@ -516,8 +517,18 @@ public class ProjectsController : Controller
 
                 _context.Add(document);
             }
+        }
 
-            await _context.SaveChangesAsync();
+        for (int i = 0; i < AttemptsNumber; ++i) {
+            try {
+                await _context.SaveChangesAsync();
+                break;
+            } catch (Exception e) {
+                if (i == AttemptsNumber - 1) {
+                    throw;
+                }
+                Thread.Sleep(1000);
+            }
         }
 
         HttpContext.Session.Remove(WizardKey);
