@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 using smoothie.BLL.DTOs;
+using smoothie.BLL.Helpers;
 using smoothie.BLL.Services;
 using smoothie.DAL.Data;
 using smoothie.DAL.Models;
@@ -95,7 +96,7 @@ public class ProjectService : IProjectService
             Employees = new List<Employee>()
         };
 
-        ValidateOrThrow(project);
+        ValidationHelper.ValidateOrThrow(project, nameof(project));
 
         if (projectDto.EmployeeIds is not null && projectDto.EmployeeIds.Any()) {
             var employees = await _context.Employees
@@ -133,7 +134,7 @@ public class ProjectService : IProjectService
         if (project is null)
             throw new ArgumentNullException(nameof(project));
 
-        ValidateOrThrow(project);
+        ValidationHelper.ValidateOrThrow(project, nameof(project));
 
         try {
             bool exists = await _context.Projects.AnyAsync(p => p.Id == project.Id);
@@ -203,15 +204,6 @@ public class ProjectService : IProjectService
             } catch (IOException e) {
                 throw new IOException($"Error saving file {fileName}: {e.Message}");
             }
-        }
-    }
-
-    private void ValidateOrThrow(Project project) {
-        var validationResults = new List<ValidationResult>();
-        bool isValid = Validator.TryValidateObject(project, new ValidationContext(project), validationResults, true);
-        if (!isValid) {
-            var errors = string.Join("; ", validationResults.Select(r => r.ErrorMessage));
-            throw new ArgumentException(errors, nameof(project));
         }
     }
 
