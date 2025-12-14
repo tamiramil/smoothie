@@ -11,17 +11,18 @@ namespace Smoothie.BLL.Services;
 
 public class ProjectService : IProjectService
 {
-    private const int AttemptsNumber = 3;
-
     private readonly SmoothieContext     _context;
     private readonly IWebHostEnvironment _environment;
 
     public ProjectService(SmoothieContext context, IWebHostEnvironment environment) {
-        _context = context;
-        _environment = environment;
+        _context = context ?? throw new ArgumentNullException(nameof(context));
+        _environment = environment ?? throw new ArgumentNullException(nameof(environment));
     }
 
     public async Task<List<Project>> GetAllAsync(ProjectFilterDto filter) {
+        if (filter is null)
+            throw new ArgumentNullException(nameof(filter));
+
         var projects = _context.Projects
             .Include(p => p.CustomerCompany)
             .Include(p => p.ExecutorCompany)
@@ -80,6 +81,9 @@ public class ProjectService : IProjectService
     }
 
     public async Task<Project?> CreateAsync(ProjectWizardDto projectDto, IList<IFormFile>? files) {
+        if (projectDto is null)
+            throw new ArgumentNullException(nameof(projectDto));
+
         var project = new Project {
             Name = projectDto.Name!,
             StartDate = projectDto.StartDate!.Value,
@@ -91,16 +95,7 @@ public class ProjectService : IProjectService
             Employees = new List<Employee>()
         };
 
-        var validationResults = new List<ValidationResult>();
-        bool isValid = Validator.TryValidateObject(
-            project,
-            new ValidationContext(project),
-            validationResults,
-            true
-        );
-
-        if (!isValid)
-            throw new ArgumentException(validationResults.ToString());
+        ValidateOrThrow(project);
 
         if (projectDto.EmployeeIds is not null && projectDto.EmployeeIds.Any()) {
             var employees = await _context.Employees
@@ -112,20 +107,33 @@ public class ProjectService : IProjectService
 
         _context.Projects.Add(project);
 
-        if (files is not null && files.Any())
-            await HandleFileUploadsAsync(project, files);
+        await using var transaction = await _context.Database.BeginTransactionAsync();
 
-        await SaveWithRetryAsync();
-        return project;
+        try {
+            await _context.SaveChangesAsync();
+
+            if (files is not null && files.Any())
+                await HandleFileUploadsAsync(project, files);
+
+            await _context.SaveChangesAsync();
+            await transaction.CommitAsync();
+
+            return project;
+        } catch (IOException) {
+            await transaction.RollbackAsync();
+            throw;
+        } catch (Exception) {
+            await transaction.RollbackAsync();
+            DeleteProjectFiles(project.Id);
+            throw;
+        }
     }
 
     public async Task<bool> UpdateAsync(Project project) {
         if (project is null)
             throw new ArgumentNullException(nameof(project));
 
-        bool isValid = Validator.TryValidateObject(project, new ValidationContext(project), null, true);
-        if (!isValid)
-            throw new ArgumentException("Model provided is not valid");
+        ValidateOrThrow(project);
 
         try {
             bool exists = await _context.Projects.AnyAsync(p => p.Id == project.Id);
@@ -136,6 +144,7 @@ public class ProjectService : IProjectService
             await _context.SaveChangesAsync();
             return true;
         } catch {
+            // No advanced exception handling for now
             return false;
         }
     }
@@ -145,26 +154,29 @@ public class ProjectService : IProjectService
             return false;
 
         var project = await GetByIdAsync(id!.Value, true);
-        
+
         try {
             _context.Projects.Remove(project!);
             await _context.SaveChangesAsync();
             return true;
         } catch {
+            // No advanced exception handling for now
             return false;
         }
     }
 
     public async Task<bool> ExistsAsync(int? id) {
-        if (id is null)
+        if (id is null || id <= 0)
             return false;
 
         return await _context.Projects.AnyAsync(p => p.Id == id);
     }
 
     private async Task HandleFileUploadsAsync(Project project, IList<IFormFile> files) {
-        var uploadPath = Path.Combine(_environment.WebRootPath, "uploads", "projects", project.Id.ToString());
-        Directory.CreateDirectory(uploadPath);
+        var relUploadPath = Path.Combine("uploads", "projects", project.Id.ToString());
+        var absUploadPath = Path.Combine(_environment.WebRootPath, relUploadPath);
+
+        Directory.CreateDirectory(absUploadPath);
 
         foreach (var file in files) {
             if (file.Length == 0)
@@ -172,34 +184,48 @@ public class ProjectService : IProjectService
 
             var fileName = Path.GetFileName(file.FileName);
             var uniqueName = $"{Guid.NewGuid()}_{fileName}";
-            var filePath = Path.Combine(uploadPath, uniqueName);
+            var absFilePath = Path.Combine(absUploadPath, uniqueName);
+            var relFilePath = Path.Combine(relUploadPath, uniqueName);
 
-            await using (var stream = new FileStream(filePath, FileMode.Create)) {
-                await file.CopyToAsync(stream);
+            try {
+                await using (var stream = new FileStream(absFilePath, FileMode.Create)) {
+                    await file.CopyToAsync(stream);
+                }
+
+                var document = new ProjectDocument {
+                    ProjectId = project.Id,
+                    FileName = fileName,
+                    FilePath = relFilePath,
+                    FileSize = file.Length
+                };
+
+                _context.Add(document);
+            } catch (IOException e) {
+                throw new IOException($"Error saving file {fileName}: {e.Message}");
             }
-
-            var document = new ProjectDocument {
-                Project = project,
-                FileName = fileName,
-                FilePath = $"/uploads/projects/{uniqueName}",
-                FileSize = file.Length
-            };
-
-            _context.Add(document);
         }
     }
 
-    private async Task SaveWithRetryAsync() {
-        for (int i = 0; i < AttemptsNumber; ++i) {
-            try {
-                await _context.SaveChangesAsync();
-                return;
-            } catch (Exception e) {
-                if (i == AttemptsNumber - 1)
-                    throw;
+    private void ValidateOrThrow(Project project) {
+        var validationResults = new List<ValidationResult>();
+        bool isValid = Validator.TryValidateObject(project, new ValidationContext(project), validationResults, true);
+        if (!isValid) {
+            var errors = string.Join("; ", validationResults.Select(r => r.ErrorMessage));
+            throw new ArgumentException(errors, nameof(project));
+        }
+    }
 
-                await Task.Delay(1000);
+    private void DeleteProjectFiles(int projectId) {
+        try {
+            var uploadPath = Path.Combine(_environment.WebRootPath, "uploads", "projects", projectId.ToString());
+            if (Directory.Exists(uploadPath)) {
+                Directory.Delete(uploadPath, recursive: true);
             }
+        } catch (Exception ex) {
+            Console.WriteLine(
+                $"WARNING: Failed to clean up files for Project ID {projectId} :(\n" +
+                $"Manual cleanup required: {ex.Message}"
+            );
         }
     }
 }
