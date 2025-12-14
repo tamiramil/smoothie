@@ -5,9 +5,36 @@ Test project for Sibers — intern/junior C# Developer
 ## Tech Stack
 
 - **.NET 9.0**
-- **ASP.NET Core MVC** (not three-layer architecture, my bad)
+- **ASP.NET Core MVC**
+- **N-Layer Architecture** (PL/BLL/DAL)
 - **Entity Framework Core**
 - **SQLite**
+
+## Architecture
+
+The project follows **N-Layer Architecture** pattern with clear separation of concerns:
+
+```
+┌─────────────────────────────────────────────┐
+│  Presentation Layer (smoothie.Web)          │
+│  Controllers, Views, ViewModels             │
+└──────────────────┬──────────────────────────┘
+                   │
+┌──────────────────▼──────────────────────────┐
+│  Business Logic Layer (smoothie.BLL)        │
+│  Services, DTOs                             │
+└──────────────────┬──────────────────────────┘
+                   │
+┌──────────────────▼──────────────────────────┐
+│  Data Access Layer (smoothie.DAL)           │
+│  DbContext, Models                          │
+└─────────────────────────────────────────────┘
+```
+
+### Layer Dependencies
+- **PLL** → depends on → **BLL**
+- **BLL** → depends on → **DAL**
+- **DAL** → independent (only EF Core dependency)
 
 ## Run Requirements
 
@@ -15,76 +42,51 @@ Test project for Sibers — intern/junior C# Developer
 - Any IDE (optional): Visual Studio, VS Code, Rider
 
 ## Quick Start
+
 In terminal (if Windows: press `Win+R`, type `cmd`, press `Enter`)
+
 ```bash
 git clone https://github.com/tamiramil/smoothie.git
 cd smoothie
 dotnet restore
-dotnet run
+dotnet build
+dotnet run --project smoothie.Web
 ```
 
-Database is created automatically at the first run (`<app-root>/app.db`).
+Database is created automatically at the first run (`smoothie.Web/app.db`).
 
 **To open the app:**
 - HTTPS: `https://localhost:7185`
 - HTTP: `http://localhost:5136`
 
-To change the ports edit `<app-root>/Properties/launchSettings.json`:
+To change the ports edit `smoothie.Web/Properties/launchSettings.json`:
 ```json
 "applicationUrl": "https://localhost:7185;http://localhost:5136"
 ```
 
 ---
 
-## Project Structure
-```
-smoothie
-├── app.db
-├── appsettings.json
-├── Controllers
-│   ├── CompaniesController.cs
-│   ├── EmployeesController.cs
-│   ├── HomeController.cs
-│   └── ProjectsController.cs
-├── Data
-│   └── SmoothieContext.cs
-├── Models
-│   ├── Company.cs
-│   ├── Employee.cs
-│   ├── Project.cs
-│   └── ProjectDocument.cs
-├── Properties
-│   └── launchSettings.json
-├── ViewModel
-│   ├── ErrorViewModel.cs
-│   └── ProjectWizardViewModel.cs
-├── Views
-│   ├── Home
-│   ├── Projects
-│   ├── Shared
-│   ├── _ViewImports.cshtml
-│   └── _ViewStart.cshtml
-└── wwwroot
-```
+## Features
 
----
+### Backend
 
-## Functionality
-
-#### Backend
-
-- [x] **CRUD for Projects and Employees**
-- [x] **CRUD for Companies** (through API, not UI)
+- [x] **CRUD for Projects, Employees and Companies**
 - [x] **Projects list filtering and sorting**
 
-#### Frontend (Razor)
+### Frontend
 
-- [x] **Project creation wizard** (no Drag&Drop)
+- [x] **5-Step Project Creation Wizard**
+  - Step A: Basic information
+  - Step B: Companies selection
+  - Step C: Project manager assignment (AJAX search)
+  - Step D: Team members selection (AJAX search)
+  - Step E: Files uploading
 - [x] **Projects Management:**
-  - Projects list view
+  - Projects list view with filtering
   - View & edit specific project details
-  - Remove project
-- [x] AJAX search for employees in wizard
+  - Remove project with confirmation
+- [x] **AJAX search** for employees in wizard
+- [x] **File uploads** for project documents
 
 ---
 
@@ -104,10 +106,10 @@ smoothie
 
 **Solution:** Change port:
 ```bash
-dotnet run --urls="http://localhost:xxxx"
+dotnet run --project smoothie.Web --urls="http://localhost:xxxx"
 ```
 
-Or edit `Properties/launchSettings.json`.
+Or edit `smoothie.Web/Properties/launchSettings.json`.
 
 ---
 
@@ -115,7 +117,7 @@ To reset db just remove `app.db` file in the project root directory.
 
 ---
 
-## Dev histoory
+## Development History
 
 Full development history is accessible here in commits:
 ```bash
