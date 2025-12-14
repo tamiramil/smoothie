@@ -11,7 +11,7 @@ public class Project : IValidatableObject
 
     [Required]
     [StringLength(100)]
-    public string? Name { get; set; }
+    public string Name { get; set; }
 
     [Required]
     public DateTime StartDate { get; set; }
