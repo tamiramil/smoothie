@@ -1,0 +1,34 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.0.31903.59
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "smoothie.DAL", "smoothie.DAL\smoothie.DAL.csproj", "{291F4C3B-62DA-4322-BF56-684B512889CD}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "smoothie.BLL", "smoothie.BLL\smoothie.BLL.csproj", "{AAB57A9F-D1FA-4EA9-B3BB-36E5126E610C}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "smoothie.Web", "smoothie.Web\smoothie.Web.csproj", "{F4E306CC-3942-495C-8580-B109ABEA0A51}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{291F4C3B-62DA-4322-BF56-684B512889CD}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{291F4C3B-62DA-4322-BF56-684B512889CD}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{291F4C3B-62DA-4322-BF56-684B512889CD}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{291F4C3B-62DA-4322-BF56-684B512889CD}.Release|Any CPU.Build.0 = Release|Any CPU
+		{AAB57A9F-D1FA-4EA9-B3BB-36E5126E610C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{AAB57A9F-D1FA-4EA9-B3BB-36E5126E610C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{AAB57A9F-D1FA-4EA9-B3BB-36E5126E610C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{AAB57A9F-D1FA-4EA9-B3BB-36E5126E610C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F4E306CC-3942-495C-8580-B109ABEA0A51}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F4E306CC-3942-495C-8580-B109ABEA0A51}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F4E306CC-3942-495C-8580-B109ABEA0A51}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F4E306CC-3942-495C-8580-B109ABEA0A51}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+EndGlobal

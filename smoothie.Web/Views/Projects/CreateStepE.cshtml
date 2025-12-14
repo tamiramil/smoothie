@@ -1,0 +1,151 @@
+@{
+    ViewData["Title"] = "Create Project - Step 5";
+}
+
+<div class="container mt-4">
+    <div class="row">
+        <div class="col-md-8 offset-md-2">
+            <h2>Create New Project</h2>
+            <div class="card">
+                <div class="card-header bg-success text-white">
+                    <h4 class="mb-0">Upload Documents (Optional)</h4>
+                </div>
+                <div class="card-body">
+                    <form asp-action="CreateStepE" method="post" enctype="multipart/form-data">
+                        <div class="mb-3">
+                            <label for="files" class="form-label">Upload Project Documents</label>
+                            <input type="file"
+                                   name="files"
+                                   id="files"
+                                   class="form-control"
+                                   multiple
+                                   accept=".pdf,.doc,.docx,.xls,.xlsx,.txt,.png,.jpg,.jpeg"/>
+                            <small class="form-text text-muted">
+                                Accepted formats: PDF, Word, Excel, Text, Images
+                            </small>
+                        </div>
+
+                        <div id="fileList" class="mb-3"></div>
+
+                        <div class="d-flex justify-content-between mt-4">
+                            <button type="submit" name="action" value="back" class="btn btn-secondary">Back</button>
+                            <div>
+                                <a asp-action="Index" class="btn btn-outline-secondary me-2">Cancel</a>
+                                <button type="submit" name="action" value="finish" class="btn btn-success">
+                                    <i class="bi bi-check-circle"></i> Finish & Create Project
+                                </button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        function formatFileSize(bytes) {
+            if (bytes === 0) return '0 Bytes';
+            const k = 1024;
+            const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+            const i = Math.floor(Math.log(bytes) / Math.log(k));
+            return Math.round(bytes / Math.pow(k, i) * 100) / 100 + ' ' + sizes[i];
+        }
+
+        function getFileExtension(filename) {
+            return filename.slice((filename.lastIndexOf('.') - 1 >>> 0) + 2);
+        }
+
+        function initialize() {
+            const fileInput = document.getElementById('files');
+            const fileListContainer = document.getElementById('fileList');
+
+            let activeFiles = [];
+
+            function syncFiles() {
+                const dataTransfer = new DataTransfer();
+                activeFiles.forEach(file => dataTransfer.items.add(file));
+                fileInput.files = dataTransfer.files;
+            }
+
+            fileInput.addEventListener('change', function () {
+                activeFiles = [...activeFiles, ...Array.from(this.files)];
+
+                const uniqueFiles = new Set();
+                activeFiles = activeFiles.filter(file => {
+                    const key = `${file.name}-${file.size}`;
+                    if (!uniqueFiles.has(key)) {
+                        uniqueFiles.add(key);
+                        return true;
+                    }
+                    return false;
+                });
+                
+                syncFiles();
+                renderFileList();
+            });
+
+            function renderFileList() {
+                fileListContainer.innerHTML = '';
+
+                if (activeFiles.length === 0) return;
+
+                const listGroup = document.createElement('div');
+                listGroup.className = 'list-group';
+
+                const header = document.createElement('div');
+                header.className = 'list-group-item active d-flex justify-content-between align-items-center';
+                header.textContent = `Selected Files (${activeFiles.length})`;
+                listGroup.appendChild(header);
+
+                activeFiles.forEach((file, index) => {
+                    const item = createItem(file, index);
+                    listGroup.appendChild(item);
+                });
+
+                fileListContainer.appendChild(listGroup);
+            }
+
+            function createItem(file, index) {
+                const item = document.createElement('div');
+                item.className = 'list-group-item d-flex justify-content-between align-items-center';
+
+                item.dataset.fileIndex = index;
+
+                const fileInfo = document.createElement('div');
+                fileInfo.innerHTML = `
+                    <strong>${file.name}</strong>
+                    <br>
+                    <small class="text-muted">${formatFileSize(file.size)}</small>
+                `;
+
+                const rightSide = document.createElement('div');
+                
+                const badge = document.createElement('span');
+                badge.className = 'badge bg-primary rounded-pill';
+                badge.textContent = getFileExtension(file.name).toUpperCase();
+
+                const dismiss = document.createElement('button');
+                dismiss.setAttribute('type', 'button');
+                dismiss.setAttribute('aria-label', 'Close');
+                dismiss.className = 'btn-close';
+                dismiss.onclick = () => removeFile(index);
+
+                rightSide.appendChild(badge);
+                rightSide.appendChild(dismiss);
+                item.appendChild(fileInfo);
+                item.appendChild(rightSide);
+                return item;
+            }
+
+            function removeFile(index) {
+                activeFiles.splice(index, 1);
+                syncFiles();
+                renderFileList();
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', initialize);
+    </script>
+}

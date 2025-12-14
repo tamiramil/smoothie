@@ -1,0 +1,75 @@
+@model smoothie.Web.ViewModels.ProjectWizardViewModel
+
+@{
+    ViewData["Title"] = "Create Project - Step 3";
+}
+
+<div class="container mt-4">
+    <div class="row">
+        <div class="col-md-8 offset-md-2">
+            <h2>Create New Project</h2>
+            <div class="card">
+                <div class="card-header">
+                    <h4>Project Head</h4>
+                </div>
+                <div class="card-body">
+                    <form asp-action="CreateStepC" method="post">
+                        <div class="input-group mb-3">
+                            <label asp-for="HeadId" class="input-group-text">Select Project Head</label>
+                            <select asp-for="HeadId" id="employeesContainer" class="form-select">
+                            </select>
+                            <input id="employeeSearch" class="form-control" type="text" placeholder="Type name..."/>
+                        </div>
+
+                        <div class="d-flex justify-content-between mt-4">
+                            <button type="submit" name="action" value="back" class="btn btn-secondary">Back</button>
+                            <div>
+                                <a asp-action="Index" class="btn btn-outline-secondary me-2">Cancel</a>
+                                <button type="submit" name="action" value="next" class="btn btn-primary">Next</button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{ await Html.RenderPartialAsync("_ValidationScriptsPartial"); }
+    <script>
+        document.addEventListener("DOMContentLoaded", () => {
+            loadEmployees("");
+        });
+
+        let searchInput = document.getElementById("employeeSearch");
+        let container = document.getElementById("employeesContainer");
+
+        searchInput.addEventListener("input", function () {
+            loadEmployees(this.value.trim());
+        });
+
+        searchInput.addEventListener("keydown", function (e) {
+            if (e.key === "Enter") {
+                e.preventDefault();
+            }
+        });
+
+        function loadEmployees(pattern) {
+            fetch(`/Employees/SearchByPattern/?pattern=${encodeURIComponent(pattern)}`)
+                .then(r => r.json())
+                .then(data => {
+                    container.innerHTML = "";
+                    data.forEach(e => {
+                        const option = document.createElement('option');
+
+                        option.value = e.id;
+                        option.textContent = e.fullName;
+
+                        container.appendChild(option);
+                    });
+                })
+                .catch(err => console.error('Failed to load employees:', err));
+        }
+    </script>
+};
