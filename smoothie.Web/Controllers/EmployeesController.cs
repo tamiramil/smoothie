@@ -52,21 +52,22 @@ public class EmployeesController : Controller
         var employee = await _employeeService.GetByIdAsync(id!.Value);
 
         var employeeDto = new EmployeeDto {
-            FirstName = employee?.FirstName,
-            SecondName = employee?.SecondName,
-            LastName = employee?.LastName,
-            Email = employee?.Email
+            Id = employee!.Id,
+            FirstName = employee.FirstName,
+            SecondName = employee.SecondName,
+            LastName = employee.LastName,
+            Email = employee.Email
         };
 
         return View(employeeDto);
     }
 
     [HttpPost]
-    public async Task<IActionResult> Edit(int id, EmployeeDto employeeDto) {
+    public async Task<IActionResult> Edit(EmployeeDto employeeDto) {
         if (!ModelState.IsValid)
             return View(employeeDto);
 
-        var success = await _employeeService.UpdateAsync(id, employeeDto);
+        var success = await _employeeService.UpdateAsync(employeeDto);
         if (!success)
             return NotFound();
 

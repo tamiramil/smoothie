@@ -1,22 +1,31 @@
 using Microsoft.EntityFrameworkCore;
 using smoothie.BLL.DTOs;
+using smoothie.BLL.Helpers;
 using smoothie.DAL.Data;
 using smoothie.DAL.Models;
 
 namespace smoothie.BLL.Services;
 
+///<inheritdoc/>
 public class EmployeeService : IEmployeeService
 {
     private readonly SmoothieContext _context;
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="EmployeeService"/> class.
+    /// </summary>
+    /// <param name="context">The database context for project operations.</param>
+    /// <exception cref="ArgumentNullException">Thrown if <paramref name="context"/> is null.</exception>
     public EmployeeService(SmoothieContext context) {
-        _context = context;
+        _context = context ?? throw new ArgumentNullException(nameof(context));
     }
 
+    ///<inheritdoc/>
     public async Task<List<Employee>> GetAllAsync() {
         return await _context.Employees.ToListAsync();
     }
 
+    ///<inheritdoc/>
     public async Task<List<EmployeeIndexDto>> GetAllIndexAsync() {
         return await _context.Employees.Select(e => new EmployeeIndexDto {
                 Id = e.Id,
@@ -28,6 +37,7 @@ public class EmployeeService : IEmployeeService
         ).ToListAsync();
     }
 
+    ///<inheritdoc/>
     public async Task<Employee?> GetByIdAsync(int id, bool includeRelations = false) {
         var employees = _context.Employees.AsQueryable();
 
@@ -39,6 +49,7 @@ public class EmployeeService : IEmployeeService
         return await employees.FirstOrDefaultAsync(e => e.Id == id);
     }
 
+    ///<inheritdoc/>
     public async Task<List<Employee>> GetByPatternAsync(string pattern, bool includeRelations = false) {
         var employees = _context.Employees.AsQueryable();
 
@@ -56,6 +67,7 @@ public class EmployeeService : IEmployeeService
         return await employees.ToListAsync();
     }
 
+    ///<inheritdoc/>
     public async Task<List<Employee>> GetByProjectIdAsync(int projectId, bool includeRelations = false) {
         var employees = _context.Employees.AsQueryable();
 
@@ -69,6 +81,7 @@ public class EmployeeService : IEmployeeService
             .ToListAsync();
     }
 
+    ///<inheritdoc/>
     public async Task<Employee?> CreateAsync(EmployeeDto employeeDto) {
         var employee = new Employee {
             FirstName = employeeDto.FirstName,
@@ -77,21 +90,24 @@ public class EmployeeService : IEmployeeService
             Email = employeeDto.Email,
         };
 
+        ValidationHelper.ValidateOrThrow(employee, nameof(employee));
+
         try {
             _context.Employees.Add(employee);
             await _context.SaveChangesAsync();
             return employee;
-        } catch {
-            return null;
+        } catch (Exception e) {
+            throw;
         }
     }
 
-    public async Task<bool> UpdateAsync(int id, EmployeeDto employeeDto) {
+    ///<inheritdoc/>
+    public async Task<bool> UpdateAsync(EmployeeDto employeeDto) {
         if (employeeDto is null)
             throw new ArgumentNullException(nameof(employeeDto));
 
         try {
-            var employee = await _context.Employees.FirstOrDefaultAsync(e => e.Id == id);
+            var employee = await GetByIdAsync(employeeDto.Id);
             if (employee is null)
                 return false;
 
@@ -103,25 +119,30 @@ public class EmployeeService : IEmployeeService
             _context.Update(employee);
             await _context.SaveChangesAsync();
             return true;
-        } catch {
+        } catch (Exception) {
+            // No advanced exception handling for now
             return false;
         }
     }
 
+    ///<inheritdoc/>
     public async Task<bool> DeleteAsync(int id) {
-        var employee = await _context.Employees.FindAsync(id);
-        if (employee is null)
+        if (!await ExistsAsync(id))
             return false;
+
+        var employee = await GetByIdAsync(id);
 
         try {
-            _context.Employees.Remove(employee);
+            _context.Employees.Remove(employee!);
             await _context.SaveChangesAsync();
             return true;
-        } catch {
+        } catch (Exception) {
+            // No advanced exception handling for now
             return false;
         }
     }
 
+    ///<inheritdoc/>
     public async Task<bool> ExistsAsync(int? id) {
         if (id is null)
             return false;

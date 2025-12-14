@@ -1,4 +1,3 @@
-using System.ComponentModel.DataAnnotations;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
@@ -15,11 +14,18 @@ public class ProjectService : IProjectService
     private readonly SmoothieContext     _context;
     private readonly IWebHostEnvironment _environment;
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="ProjectService"/> class.
+    /// </summary>
+    /// <param name="context">The database context for project operations.</param>
+    /// <param name="environment">The web host environment for file handling (e.g., getting WebRootPath).</param>
+    /// <exception cref="ArgumentNullException">Thrown if <paramref name="context"/> or <paramref name="environment"/> is null.</exception>
     public ProjectService(SmoothieContext context, IWebHostEnvironment environment) {
         _context = context ?? throw new ArgumentNullException(nameof(context));
         _environment = environment ?? throw new ArgumentNullException(nameof(environment));
     }
 
+    /// <inheritdoc/>
     public async Task<List<Project>> GetAllAsync(ProjectFilterDto filter) {
         if (filter is null)
             throw new ArgumentNullException(nameof(filter));
@@ -67,6 +73,7 @@ public class ProjectService : IProjectService
         return await projects.ToListAsync();
     }
 
+    /// <inheritdoc/>
     public async Task<Project?> GetByIdAsync(int id, bool includeRelations = false) {
         var projects = _context.Projects.AsQueryable();
 
@@ -81,6 +88,7 @@ public class ProjectService : IProjectService
         return await projects.FirstOrDefaultAsync(p => p.Id == id);
     }
 
+    /// <inheritdoc/>
     public async Task<Project?> CreateAsync(ProjectWizardDto projectDto, IList<IFormFile>? files) {
         if (projectDto is null)
             throw new ArgumentNullException(nameof(projectDto));
@@ -130,6 +138,7 @@ public class ProjectService : IProjectService
         }
     }
 
+    /// <inheritdoc/>
     public async Task<bool> UpdateAsync(Project project) {
         if (project is null)
             throw new ArgumentNullException(nameof(project));
@@ -137,8 +146,7 @@ public class ProjectService : IProjectService
         ValidationHelper.ValidateOrThrow(project, nameof(project));
 
         try {
-            bool exists = await _context.Projects.AnyAsync(p => p.Id == project.Id);
-            if (!exists)
+            if (!await ExistsAsync(project.Id))
                 return false;
 
             _context.Update(project);
@@ -150,6 +158,7 @@ public class ProjectService : IProjectService
         }
     }
 
+    /// <inheritdoc/>
     public async Task<bool> DeleteAsync(int? id) {
         if (!await ExistsAsync(id))
             return false;
@@ -166,12 +175,15 @@ public class ProjectService : IProjectService
         }
     }
 
+    /// <inheritdoc/>
     public async Task<bool> ExistsAsync(int? id) {
         if (id is null || id <= 0)
             return false;
 
         return await _context.Projects.AnyAsync(p => p.Id == id);
     }
+
+    // --- Private Methods ---
 
     private async Task HandleFileUploadsAsync(Project project, IList<IFormFile> files) {
         var relUploadPath = Path.Combine("uploads", "projects", project.Id.ToString());
@@ -213,10 +225,10 @@ public class ProjectService : IProjectService
             if (Directory.Exists(uploadPath)) {
                 Directory.Delete(uploadPath, recursive: true);
             }
-        } catch (Exception ex) {
+        } catch (Exception e) {
             Console.WriteLine(
                 $"WARNING: Failed to clean up files for Project ID {projectId} :(\n" +
-                $"Manual cleanup required: {ex.Message}"
+                $"Manual cleanup required: {e.Message}"
             );
         }
     }
